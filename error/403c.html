@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>403 - Access Denied (mTLS)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            padding: 2rem;
+            max-width: 600px;
+            margin: auto;
+        }
+        .card {
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            padding: 2rem;
+        }
+        h1 {
+            color: #c92a2a;
+        }
+        .reason {
+            font-weight: bold;
+            color: #495057;
+            margin-top: 1rem;
+        }
+        code {
+            background-color: #f1f3f5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>403 - Access Denied</h1>
+        <p>Your request could not be authenticated using a valid client certificate.</p>
+
+        <div class="reason" id="reasonText">
+            <p>Reason: unknown.</p>
+        </div>
+
+        <p>If you believe this is an error, please contact your administrator and provide the reason code below:</p>
+        <p><code id="reasonCode">-</code></p>
+    </div>
+
+    <script>
+        // Display error reason from ?reason= parameter in URL
+        const params = new URLSearchParams(window.location.search);
+        const reason = params.get("reason");
+        const reasons = {
+            "insecure-connection": "Connection is not secure (HTTPS required).",
+            "missing-cert": "No client certificate was provided.",
+            "issuer-name-mismatch": "The certificate was issued by an unexpected authority.",
+            "issuer-not-trusted": "The issuing certificate authority is not trusted.",
+            "crl-check-failed": "The certificate's revocation status could not be verified.",
+            "cert-expired": "The certificate has expired.",
+            "cert-notyetvalid": "The certificate is not yet valid.",
+            "validation-error": "An unexpected error occurred during certificate validation."
+        };
+
+        if (reason && reasons[reason]) {
+            document.getElementById("reasonText").innerHTML = `<p>Reason: ${reasons[reason]}</p>`;
+            document.getElementById("reasonCode").innerText = reason;
+        } else if (reason) {
+            document.getElementById("reasonCode").innerText = reason;
+        }
+    </script>
+</body>
+</html>
