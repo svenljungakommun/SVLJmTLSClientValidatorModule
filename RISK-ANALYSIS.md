@@ -3,11 +3,11 @@ A structured threat and mitigation analysis
 
 ## 📚 Table of Contents
 
-- [Introduction](#introduction)  
-- [Protected Assets](#protected-assets)  
-- [Identified Risks](#identified-risks)  
-- [Module Assessment (Post-Mitigation)](#module-assessment-post-mitigation)  
-- [Recommended Actions](#recommended-actions)
+- [Introduction]
+- [Protected Assets]
+- [Identified Risks]
+- [Module Assessment (Post-Mitigation)]
+- [Recommended Actions]
 
 ---
 
