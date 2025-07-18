@@ -70,12 +70,6 @@ C:\inetpub\wwwroot\mtls-site
     </modules>
   </system.webServer>
 
-  <system.web>
-    <httpModules>
-      <add name="SVLJmTLSClientValidatorModule"
-           type="SVLJ.Security.SVLJmTLSClientValidatorModule" />
-    </httpModules>
-  </system.web>
 </configuration>
 ````
 
