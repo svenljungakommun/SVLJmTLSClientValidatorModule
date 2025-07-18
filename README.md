@@ -2,7 +2,6 @@
 
 **Mutual TLS (mTLS) enforcement module for ASP.NET/IIS**  
 Maintainer: Svenljunga kommun  
-License: MIT
 
 ---
 
