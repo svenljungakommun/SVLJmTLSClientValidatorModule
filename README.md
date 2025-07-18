@@ -59,7 +59,7 @@ C:\inetpub\wwwroot\mtls-site
   <appSettings>
     <add key="SVLJ_IssuerName" value="Some CA" />
     <add key="SVLJ_IssuerThumbprint" value="ABCDEF123456..." />
-    <add key="SVLJ_CABundlePath" value="C:\inetpub\wwwroot\mtls-site\ca-bundle.pem" />
+    <add key="SVLJ_CABundlePath" value="C:\inetpub\wwwroot\mTLSBundles\ca-bundle.pem" />
     <add key="SVLJ_ErrorRedirectUrl" value="/error/403c.html" />
   </appSettings>
 
