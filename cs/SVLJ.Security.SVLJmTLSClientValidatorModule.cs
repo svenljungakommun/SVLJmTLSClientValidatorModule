@@ -49,6 +49,7 @@ namespace SVLJ.Security
     /// Configuration is handled via `appSettings` in `web.config`:
     /// - SVLJ_IssuerName           = Required Issuer CN (e.g. "SVLJ ADM Issuing CA v1")
     /// - SVLJ_IssuerThumbprint     = (Optional) SHA-1 thumbprint of the trusted issuer certificate
+    /// - SVLJ_CertSerialNumbers    = (Optional) Comma-separated list of allowed client certificate serial numbers
     /// - SVLJ_CABundlePath         = Full path to a PEM file containing trusted CA certificates
     /// - SVLJ_ErrorRedirectUrl     = URL to redirect unauthorized clients (default: /error/403c.html)
     ///
