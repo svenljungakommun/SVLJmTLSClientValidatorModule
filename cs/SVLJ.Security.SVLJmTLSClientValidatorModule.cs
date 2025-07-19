@@ -64,12 +64,13 @@ namespace SVLJ.Security
     /// Recommended environment: Windows Server with IIS 10+, .NET Framework 4.7.2+
     ///
     /// Author: Abdulaziz Almazrli
-	  /// Version: 1.4
-	  /// Updated: 2025-07-17
+	  /// Version: 1.4.1
+	  /// Updated: 2025-07-20
     /// </summary>
 
     public class SVLJmTLSClientValidatorModule : IHttpModule
     {
+	private static string RequiredSubjectSerialNumbers;
         private static string RequiredIssuerName;
         private static string RequiredIssuerThumbprint;
         private static string CABundlePath;
@@ -78,10 +79,11 @@ namespace SVLJ.Security
         private static readonly object IssuerLock = new object();
         public void Init(HttpApplication context)
         {
-            RequiredIssuerName       = ConfigurationManager.AppSettings["SVLJ_IssuerName"];
-            RequiredIssuerThumbprint = ConfigurationManager.AppSettings["SVLJ_IssuerThumbprint"]?.Replace(" ", "").ToUpperInvariant();
-            CABundlePath             = ConfigurationManager.AppSettings["SVLJ_CABundlePath"];
-            ErrorPageUrl             = ConfigurationManager.AppSettings["SVLJ_ErrorRedirectUrl"] ?? "/error/403c.html";
+	    RequiredSubjectSerialNumbers	= ConfigurationManager.AppSettings["SVLJ_SubjectSerialNumbers"];
+            RequiredIssuerName			= ConfigurationManager.AppSettings["SVLJ_IssuerName"];
+            RequiredIssuerThumbprint		= ConfigurationManager.AppSettings["SVLJ_IssuerThumbprint"]?.Replace(" ", "").ToUpperInvariant();
+            CABundlePath			= ConfigurationManager.AppSettings["SVLJ_CABundlePath"];
+            ErrorPageUrl			= ConfigurationManager.AppSettings["SVLJ_ErrorRedirectUrl"] ?? "/error/403c.html";
             LoadCABundle(CABundlePath);
             context.BeginRequest += OnBeginRequest;
         }
@@ -172,7 +174,21 @@ namespace SVLJ.Security
                     Redirect(app, "cert-notyetvalid");
                     return;
                 }
- 
+
+		// Step 6: Check optional strict SerialNumber whitelist
+  		if (!string.IsNullOrWhiteSpace(RequiredSubjectSerialNumbers))
+		{
+		    var serialWhitelist = RequiredSubjectSerialNumbers.Split(',')
+		        .Select(s => s.Trim().ToUpperInvariant())
+		        .Where(s => !string.IsNullOrWhiteSpace(s))
+		        .ToHashSet();
+		
+		    if (!serialWhitelist.Contains(clientCert.SerialNumber.ToUpperInvariant()))
+		    {
+		        Redirect(app, "serial-mismatch");
+		        return;
+		    }
+		}
  
             }
             catch (Exception ex)
