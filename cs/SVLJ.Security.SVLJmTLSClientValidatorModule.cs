@@ -70,7 +70,7 @@ namespace SVLJ.Security
 
     public class SVLJmTLSClientValidatorModule : IHttpModule
     {
-	private static string RequiredSubjectSerialNumbers;
+	private static string RequiredCertSerialNumbers;
         private static string RequiredIssuerName;
         private static string RequiredIssuerThumbprint;
         private static string CABundlePath;
@@ -79,7 +79,7 @@ namespace SVLJ.Security
         private static readonly object IssuerLock = new object();
         public void Init(HttpApplication context)
         {
-	    RequiredSubjectSerialNumbers	= ConfigurationManager.AppSettings["SVLJ_SubjectSerialNumbers"];
+	    RequiredCertSerialNumbers		= ConfigurationManager.AppSettings["SVLJ_CertSerialNumbers"];
             RequiredIssuerName			= ConfigurationManager.AppSettings["SVLJ_IssuerName"];
             RequiredIssuerThumbprint		= ConfigurationManager.AppSettings["SVLJ_IssuerThumbprint"]?.Replace(" ", "").ToUpperInvariant();
             CABundlePath			= ConfigurationManager.AppSettings["SVLJ_CABundlePath"];
@@ -176,9 +176,9 @@ namespace SVLJ.Security
                 }
 
 		// Step 6: Check optional strict SerialNumber whitelist
-  		if (!string.IsNullOrWhiteSpace(RequiredSubjectSerialNumbers))
+  		if (!string.IsNullOrWhiteSpace(RequiredCertSerialNumbers))
 		{
-		    var serialWhitelist = RequiredSubjectSerialNumbers.Split(',')
+		    var serialWhitelist = RequiredCertSerialNumbers.Split(',')
 		        .Select(s => s.Trim().ToUpperInvariant())
 		        .Where(s => !string.IsNullOrWhiteSpace(s))
 		        .ToHashSet();
