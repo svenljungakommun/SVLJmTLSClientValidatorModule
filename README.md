@@ -23,6 +23,7 @@ It validates client X.509 certificates against configurable trust policies, incl
   - Validates chain against PEM bundle (`SVLJ_CABundlePath`)
   - Performs CRL check via `X509Chain`
   - Enforces NotBefore and NotAfter date validity
+  - Optional strict client certificate serial whitelist (SVLJ_CertSerialNumbers)
 - 📤 Certificate attributes exposed as HTTP headers:
   - `HTTP_SVLJ_SUBJECT`
   - `HTTP_SVLJ_ISSUER`
@@ -45,6 +46,7 @@ C:\inetpub\wwwroot\mtls-site
 ├── error
 │   └── 403c.html
 ├── Web.config
+C:\inetpub\wwwroot\mTLSBundles
 └── ca-bundle.pem
 
 ````
@@ -56,6 +58,7 @@ C:\inetpub\wwwroot\mtls-site
 ```xml
 <configuration>
   <appSettings>
+    <add key="SVLJ_CertSerialNumbers" value="12AB34CD56EF7890,ABCDE12345FEDCBA" />
     <add key="SVLJ_IssuerName" value="Some CA" />
     <add key="SVLJ_IssuerThumbprint" value="ABCDEF123456..." />
     <add key="SVLJ_CABundlePath" value="C:\inetpub\wwwroot\mTLSBundles\ca-bundle.pem" />
@@ -118,6 +121,7 @@ Redirects unauthorized requests to:
 | `expired-cert`         | Certificate is expired           |
 | `cert-notyetvalid`     | Certificate is not yet valid     |
 | `validation-error`     | Internal error during validation |
+| `serial-mismatch`      | Serial number mismatch           |
 | `insecure-connection`  | Request was not made over HTTPS  |
 
 ---
