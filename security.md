@@ -6,7 +6,7 @@ If you discover a security vulnerability in this module, **please report it resp
 
 - **Do not create public GitHub issues**
 - Instead, contact:  
-  - 📧 support@svenljunga.se  
+  - 📧 security@svlj.net
 
 Please include:
 - Description of the vulnerability
