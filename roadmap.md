@@ -22,9 +22,6 @@ They can be enabled explicitly via `web.config` (`appSettings`) to maintain comp
 - [ ] Signature algorithm enforcement  
   _(Reject certs signed with SHA1, MD5, or other insecure algorithms)_
 
-- [ ] Subject Serial Number validation  
-  _(Require exact match against expected configured serial value)_
-
 - [ ] Local fallback cache for CRL  
   _(Optional file-based cache if online revocation fails)_
 
@@ -48,7 +45,6 @@ They can be enabled explicitly via `web.config` (`appSettings`) to maintain comp
 |----------------------------------|----------------|
 | EKU / KeyUsage enforcement       | 1.5            |
 | Signature algorithm checks       | 1.5            |
-| Subject Serial Number validation | 1.5            |
 | JSON-formatted logging           | 1.6            |
 | CRL local fallback / caching     | 1.6            |
 | Configuration validation         | 1.6            |
