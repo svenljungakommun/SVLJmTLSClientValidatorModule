@@ -1,4 +1,4 @@
-# SVLJmTLSClientValidatorModule
+# SVLJmTLSClientValidatorModule v1.4.1
 
 **Mutual TLS (mTLS) enforcement module for ASP.NET/IIS**  
 Maintainer: Svenljunga kommun  
