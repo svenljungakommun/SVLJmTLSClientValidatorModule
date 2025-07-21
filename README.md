@@ -1,4 +1,4 @@
-# SVLJmTLSClientValidatorModule v1.4.1
+# SVLJmTLSClientValidatorModule v1.4.2
 
 **Mutual TLS (mTLS) enforcement module for ASP.NET/IIS**  
 Maintainer: Svenljunga kommun  
@@ -24,6 +24,7 @@ It validates client X.509 certificates against configurable trust policies, incl
   - Performs CRL check via `X509Chain`
   - Enforces NotBefore and NotAfter date validity
   - Optional strict client certificate serial whitelist (SVLJ_CertSerialNumbers)
+  - Optional IP whitelist/bypass
 - 📤 Certificate attributes exposed as HTTP headers:
   - `HTTP_SVLJ_SUBJECT`
   - `HTTP_SVLJ_ISSUER`
@@ -63,6 +64,7 @@ C:\inetpub\wwwroot\mTLSBundles
     <add key="SVLJ_IssuerThumbprint" value="ABCDEF123456..." />
     <add key="SVLJ_CABundlePath" value="C:\inetpub\wwwroot\mTLSBundles\ca-bundle.pem" />
     <add key="SVLJ_ErrorRedirectUrl" value="/error/403c.html" />
+    <add key="SVLJ_InternalBypassIPs" value="127.0.0.1,::1" />
   </appSettings>
 
   <system.webServer>
@@ -74,6 +76,46 @@ C:\inetpub\wwwroot\mTLSBundles
 
 </configuration>
 ````
+---
+
+## Using Different `appSettings` for Subfolders or Applications
+
+In scenarios where multiple parts of an IIS site require different mTLS policies — for example, `/admin/` and `/api/` needing different client certificate rules — you can apply separate configurations by placing individual `web.config` files in each application root or subfolder that is configured as an IIS application.
+
+### Example Structure
+
+```
+C:\inetpub\wwwroot\mtls-site\
+├── web.config                  <-- Base configuration
+├── admin\
+│   └── web.config              <-- Separate appSettings for /admin/
+├── api\
+│   └── web.config              <-- Separate appSettings for /api/
+```
+
+### Example `web.config` for `/admin/`
+
+```xml
+<configuration>
+  <appSettings>
+    <add key="SVLJ_IssuerName" value="SVLJ Admin CA" />
+    <add key="SVLJ_CertSerialNumbers" value="1234567890ABCDEF,AA11BB22CC33" />
+    <add key="SVLJ_ErrorRedirectUrl" value="/admin/error/403c.html" />
+  </appSettings>
+</configuration>
+```
+
+> 🧩 Make sure each folder is defined as an IIS **application** (not just a physical directory) for its `web.config` to be processed correctly.
+
+---
+
+### Notes
+
+* Each IIS application runs in its own app domain and initializes the module independently.
+* Global settings from the root `web.config` do **not cascade** to sub-applications.
+* Shared CA bundles and binaries can still be reused across applications.
+
+---
 
 ---
 
