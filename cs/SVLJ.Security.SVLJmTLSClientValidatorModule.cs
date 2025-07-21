@@ -52,6 +52,7 @@ namespace SVLJ.Security
     /// - SVLJ_CertSerialNumbers    = (Optional) Comma-separated list of allowed client certificate serial numbers
     /// - SVLJ_CABundlePath         = Full path to a PEM file containing trusted CA certificates
     /// - SVLJ_ErrorRedirectUrl     = URL to redirect unauthorized clients (default: /error/403c.html)
+    /// - SVLJ_InternalBypassIPs    = (Optional) Comma-separated list of IPs to bypass mTLS validation
     ///
     /// Requests that do not meet the policy are rejected before application logic is invoked.
     ///
@@ -64,18 +65,21 @@ namespace SVLJ.Security
     ///
     /// Recommended environment: Windows Server with IIS 10+, .NET Framework 4.7.2+
     ///
-    /// Author: Abdulaziz Almazrli
-	  /// Version: 1.4.1
-	  /// Updated: 2025-07-20
+    /// Author: Abdulaziz Almazrli / Odd-Arne Haraldsen
+    /// Version: 1.4.2
+    /// Updated: 2025-07-22
     /// </summary>
 
     public class SVLJmTLSClientValidatorModule : IHttpModule
     {
+    	// Set global parameters
 	private static string RequiredCertSerialNumbers;
         private static string RequiredIssuerName;
         private static string RequiredIssuerThumbprint;
         private static string CABundlePath;
         private static string ErrorPageUrl;
+	private static readonly HashSet<string> AllowedCertSerials = new HashSet<string>();
+ 	private static readonly HashSet<string> InternalBypassIPs = new HashSet<string>();
         private static readonly List<X509Certificate2> TrustedIssuers = new List<X509Certificate2>();
         private static readonly object IssuerLock = new object();
         public void Init(HttpApplication context)
@@ -85,6 +89,25 @@ namespace SVLJ.Security
             RequiredIssuerThumbprint		= ConfigurationManager.AppSettings["SVLJ_IssuerThumbprint"]?.Replace(" ", "").ToUpperInvariant();
             CABundlePath			= ConfigurationManager.AppSettings["SVLJ_CABundlePath"];
             ErrorPageUrl			= ConfigurationManager.AppSettings["SVLJ_ErrorRedirectUrl"] ?? "/error/403c.html";
+	    string bypassList			= ConfigurationManager.AppSettings["SVLJ_InternalBypassIPs"];
+
+	    /// Enumerate RequiredCertSerialNumbers
+            if (!string.IsNullOrWhiteSpace(RequiredCertSerialNumbers))
+	    {
+		AllowedCertSerials = RequiredCertSerialNumbers
+		.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+		.Select(s => s.Trim().ToUpperInvariant())
+		.ToHashSet();
+	    }
+
+            /// Enumerate bypassList
+	    if (!string.IsNullOrWhiteSpace(bypassList))
+            {
+                InternalBypassIPs.UnionWith(
+                    bypassList.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                              .Select(ip => ip.Trim()));
+            }
+     
             LoadCABundle(CABundlePath);
             context.BeginRequest += OnBeginRequest;
         }
@@ -117,6 +140,12 @@ namespace SVLJ.Security
         {
             var app = (HttpApplication)sender;
             var request = app.Context.Request;
+	    string clientIp = request.UserHostAddress;
+
+     	    // Internal bypass (e.g. localhost, 127.0.0.1)
+            if (InternalBypassIPs.Contains(clientIp))
+                return;
+		
             if (!request.IsSecureConnection)
             {
                 Redirect(app, "insecure-connection");
@@ -177,14 +206,10 @@ namespace SVLJ.Security
                 }
 
 		// Step 6: Check optional strict SerialNumber whitelist
-  		if (!string.IsNullOrWhiteSpace(RequiredCertSerialNumbers))
+  		if (AllowedCertSerials.Count > 0)
 		{
-		    var serialWhitelist = RequiredCertSerialNumbers.Split(',')
-		        .Select(s => s.Trim().ToUpperInvariant())
-		        .Where(s => !string.IsNullOrWhiteSpace(s))
-		        .ToHashSet();
-		
-		    if (!serialWhitelist.Contains(clientCert.SerialNumber.ToUpperInvariant()))
+		    var serial = clientCert.SerialNumber?.Trim().ToUpperInvariant();
+		    if (string.IsNullOrWhiteSpace(serial) || !AllowedCertSerials.Contains(serial))
 		    {
 		        Redirect(app, "serial-mismatch");
 		        return;
