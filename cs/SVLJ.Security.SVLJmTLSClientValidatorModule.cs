@@ -78,6 +78,7 @@ namespace SVLJ.Security
         private static string RequiredIssuerThumbprint;
         private static string CABundlePath;
         private static string ErrorPageUrl;
+	private static string bypassList;
 	private static readonly HashSet<string> AllowedCertSerials = new HashSet<string>();
  	private static readonly HashSet<string> InternalBypassIPs = new HashSet<string>();
         private static readonly List<X509Certificate2> TrustedIssuers = new List<X509Certificate2>();
@@ -89,7 +90,7 @@ namespace SVLJ.Security
             RequiredIssuerThumbprint		= ConfigurationManager.AppSettings["SVLJ_IssuerThumbprint"]?.Replace(" ", "").ToUpperInvariant();
             CABundlePath			= ConfigurationManager.AppSettings["SVLJ_CABundlePath"];
             ErrorPageUrl			= ConfigurationManager.AppSettings["SVLJ_ErrorRedirectUrl"] ?? "/error/403c.html";
-	    string bypassList			= ConfigurationManager.AppSettings["SVLJ_InternalBypassIPs"];
+	    bypassList				= ConfigurationManager.AppSettings["SVLJ_InternalBypassIPs"];
 
 	    /// Enumerate RequiredCertSerialNumbers
             if (!string.IsNullOrWhiteSpace(RequiredCertSerialNumbers))
