@@ -164,7 +164,7 @@ Redirects unauthorized requests to:
 | `issuer-name-mismatch` | Issuer CN does not match            |
 | `issuer-not-trusted`   | Thumbprint mismatch                 |
 | `crl-check-failed`     | Revocation check failed             |
-| `expired-cert`         | Certificate is expired              |
+| `cert-expired`         | Certificate is expired              |
 | `cert-notyetvalid`     | Certificate is not yet valid        |
 | `validation-error`     | Internal error during validation    |
 | `serial-mismatch`      | Serial number mismatch              |
