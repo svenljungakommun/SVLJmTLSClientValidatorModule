@@ -45,18 +45,18 @@ The module protects backend systems by enforcing strict client authentication us
 
 ## 🧪 Module Assessment (Post-Mitigation)
 
-| Protection Feature                 | Status  | Comment                                               |
+| Protection Feature                | Status  | Comment                                                |
 |-----------------------------------|---------|--------------------------------------------------------|
 | HTTPS requirement                 | ✅ OK   | Non-secure connections are blocked                     |
 | Certificate requirement           | ✅ OK   | Missing certs trigger redirect                         |
 | CA bundle validation              | ✅ OK   | Loaded from file, immutable in memory                  |
 | Issuer CN matching                | ✅ OK   | Strict X500, no regex or partial match                 |
 | Thumbprint matching               | ✅ OK   | Optional, requires exact match                         |
-| Validity period (NotBefore/After)| ✅ OK   | Implemented                                            |
+| Validity period (NotBefore/After) | ✅ OK   | Implemented                                            |
 | CRL validation                    | ⚠️ WARN | Online only, no fallback                               |
 | ServerVariables availability      | ✅ OK   | Metadata exposed to app, not encrypted                 |
 | Logging                           | ⚠️ WARN | Only System.Diagnostics.Trace, no SIEM/SOC integration |
-| EKU/KeyUsage check                | ❌ FAIL | Not implemented                                        |
+| EKU/KeyUsage check                | ✅ OK   | Implemented in version 1.4.3                           |
 | Algorithm control                 | ❌ FAIL | Not implemented                                        |
 | Physical protection class         | N/A     | Handled by environment                                 |
 
@@ -64,10 +64,10 @@ The module protects backend systems by enforcing strict client authentication us
 
 ## ✅ Recommended Actions
 
-| Recommendation                                    | Priority | Justification                             |
-|--------------------------------------------------|----------|--------------------------------------------|
-| Add EKU (Extended Key Usage) check               | High     | Restrict to correct certificate types      |
-| Add signature algorithm check (SHA256+)          | Medium   | Avoid outdated algorithms like SHA1        |
-| Implement CRL fallback via local cache or mirror | Medium   | Handle offline validation scenarios        |
+| Recommendation                                    | Priority | Justification                              |
+|---------------------------------------------------|----------|--------------------------------------------|
+| Add EKU (Extended Key Usage) check                | High     | Restrict to correct certificate types      |
+| Add signature algorithm check (SHA256+)           | Medium   | Avoid outdated algorithms like SHA1        |
+| Implement CRL fallback via local cache or mirror  | Medium   | Handle offline validation scenarios        |
 | Add logging in SIEM-compatible format (e.g., JSON)| Medium   | Simplifies troubleshooting and monitoring  |
-| Validate config at init (fail-fast)              | Low      | Increases operational reliability          |
+| Validate config at init (fail-fast)               | Low      | Increases operational reliability          |
