@@ -5,6 +5,16 @@ All notable changes to this module will be documented in this file.
 This project adheres to a **fail-closed Zero Trust model** and is used in IIS-hosted .NET environments requiring mutual TLS authentication.
 
 ---
+## [1.4.3] – 2025-07-23
+
+### Added
+- Support for Extended Key Usage (EKU) validation via `SVLJ_AllowedEKUOids` in `web.config`.
+- Parsing of EKU OIDs into `AllowedEkuOids` during `Init()`.
+- Runtime validation of client certificate EKUs in `OnBeginRequest`.
+
+### Changed
+- Issuer CN comparison now uses `string.Equals(..., StringComparison.OrdinalIgnoreCase)` instead of `ToUpperInvariant()` for improved correctness.
+- XML documentation updated to include `SVLJ_AllowedEKUOids` and reflect current behavior.
 
 ## [1.4.2] – 2025-07-22
 
