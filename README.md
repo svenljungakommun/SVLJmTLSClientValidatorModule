@@ -1,4 +1,4 @@
-# SVLJmTLSClientValidatorModule v1.4.3
+# SVLJmTLSClientValidatorModule v1.4.4
 
 **Mutual TLS (mTLS) enforcement module for ASP.NET/IIS**  
 Maintainer: Svenljunga kommun  
@@ -26,6 +26,7 @@ It validates client X.509 certificates against configurable trust policies, incl
   - Optional strict client certificate serial whitelist (SVLJ_CertSerialNumbers)
   - Optional IP whitelist/bypass
   - Optional EKU validation
+  - Optional Signature Algorithms validation
 - 📤 Certificate attributes exposed as HTTP headers:
   - `HTTP_SVLJ_SUBJECT`
   - `HTTP_SVLJ_ISSUER`
@@ -67,6 +68,7 @@ C:\inetpub\wwwroot\mTLSBundles
     <add key="SVLJ_ErrorRedirectUrl" value="/error/403c.html" />
     <add key="SVLJ_InternalBypassIPs" value="127.0.0.1,::1" />
     <add key="SVLJ_AllowedEKUOids" value="1.3.6.1.5.5.7.3.2" />
+    <add key="SVLJ_AllowedSignatureAlgorithms" value="sha256RSA, ecdsaWithSHA256" />
   </appSettings>
 
   <system.webServer>
@@ -156,19 +158,20 @@ Redirects unauthorized requests to:
 
 ### Reason codes
 
-| Code                   | Description                       |
-|------------------------|-----------------------------------|
-| `missing-cert`         | No certificate presented          |
-| `issuer-name-mismatch` | Issuer CN does not match          |
-| `issuer-not-trusted`   | Thumbprint mismatch               |
-| `crl-check-failed`     | Revocation check failed           |
-| `expired-cert`         | Certificate is expired            |
-| `cert-notyetvalid`     | Certificate is not yet valid      |
-| `validation-error`     | Internal error during validation  |
-| `serial-mismatch`      | Serial number mismatch            |
-| `eku-missing`          | EKU was required but none found   |
-| `eku-not-allowed`      | EKU was required but none matched |
-| `insecure-connection`  | Request was not made over HTTPS   |
+| Code                   | Description                         |
+|------------------------|-------------------------------------|
+| `missing-cert`         | No certificate presented            |
+| `issuer-name-mismatch` | Issuer CN does not match            |
+| `issuer-not-trusted`   | Thumbprint mismatch                 |
+| `crl-check-failed`     | Revocation check failed             |
+| `expired-cert`         | Certificate is expired              |
+| `cert-notyetvalid`     | Certificate is not yet valid        |
+| `validation-error`     | Internal error during validation    |
+| `serial-mismatch`      | Serial number mismatch              |
+| `eku-missing`          | EKU was required but none found     |
+| `eku-not-allowed`      | EKU was required but none matched   |
+| `sigalg-not-allowed`   | Signature algorithm is not allowed  |
+| `insecure-connection`  | Request was not made over HTTPS     |
 
 ---
 
