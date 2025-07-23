@@ -13,9 +13,6 @@ They can be enabled explicitly via `web.config` (`appSettings`) to maintain comp
 
 ## ✅ Under Consideration (next minor releases)
 
-- [ ] EKU (Extended Key Usage) validation  
-  _(Restrict certificates to clientAuth usage only)_
-
 - [ ] KeyUsage bit enforcement  
   _(Block certificates missing digitalSignature or with invalid bitmask)_
 
@@ -43,7 +40,6 @@ They can be enabled explicitly via `web.config` (`appSettings`) to maintain comp
 
 | Feature                          | Target Version |
 |----------------------------------|----------------|
-| EKU / KeyUsage enforcement       | 1.5            |
 | Signature algorithm checks       | 1.5            |
 | JSON-formatted logging           | 1.6            |
 | CRL local fallback / caching     | 1.6            |
