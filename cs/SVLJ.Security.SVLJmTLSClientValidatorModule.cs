@@ -47,13 +47,14 @@ namespace SVLJ.Security
     /// - Redirects unauthorized requests to a configured error URL with a reason code
     ///
     /// Configuration is handled via `appSettings` in `web.config`:
-    /// - SVLJ_IssuerName           = Required Issuer CN (e.g. "SVLJ ADM Issuing CA v1")
-    /// - SVLJ_IssuerThumbprint     = (Optional) SHA-1 thumbprint of the trusted issuer certificate
-    /// - SVLJ_CertSerialNumbers    = (Optional) Comma-separated list of allowed client certificate serial numbers
-    /// - SVLJ_CABundlePath         = Full path to a PEM file containing trusted CA certificates
-    /// - SVLJ_ErrorRedirectUrl     = URL to redirect unauthorized clients (default: /error/403c.html)
-    /// - SVLJ_InternalBypassIPs    = (Optional) Comma-separated list of IPs to bypass mTLS validation
-    /// - SVLJ_AllowedEKUOids	    = (Optional) Comma-separated list of allowed EKUs
+    /// - SVLJ_IssuerName           		= Required Issuer CN (e.g. "SVLJ ADM Issuing CA v1")
+    /// - SVLJ_IssuerThumbprint     		= (Optional) SHA-1 thumbprint of the trusted issuer certificate
+    /// - SVLJ_CertSerialNumbers    		= (Optional) Comma-separated list of allowed client certificate serial numbers
+    /// - SVLJ_CABundlePath         		= Full path to a PEM file containing trusted CA certificates
+    /// - SVLJ_ErrorRedirectUrl     		= URL to redirect unauthorized clients (default: /error/403c.html)
+    /// - SVLJ_InternalBypassIPs    		= (Optional) Comma-separated list of IPs to bypass mTLS validation
+    /// - SVLJ_AllowedEKUOids	    		= (Optional) Comma-separated list of allowed EKUs
+    /// - SVLJ_AllowedSignatureAlgorithms	= (Optional) Comma-separated list of allowed Signature Algorithms
     ///
     /// Requests that do not meet the policy are rejected before application logic is invoked.
     ///
@@ -67,7 +68,7 @@ namespace SVLJ.Security
     /// Recommended environment: Windows Server with IIS 10+, .NET Framework 4.7.2+
     ///
     /// Author: Abdulaziz Almazrli / Odd-Arne Haraldsen
-    /// Version: 1.4.3
+    /// Version: 1.4.4
     /// Updated: 2025-07-23
     /// </summary>
 
@@ -81,10 +82,12 @@ namespace SVLJ.Security
         private static string ErrorPageUrl;
 	private static string bypassList;
  	private static string ekuConfig;
+  	private static string signatureAlgsSetting;
 	private static readonly HashSet<string> AllowedCertSerials = new HashSet<string>();
  	private static readonly HashSet<string> InternalBypassIPs = new HashSet<string>();
         private static readonly List<X509Certificate2> TrustedIssuers = new List<X509Certificate2>();
 	private static readonly HashSet<string> AllowedEkuOids = new HashSet<string>();
+ 	private static readonly HashSet<string> AllowedSignatureAlgs = new HashSet<string>();
         private static readonly object IssuerLock = new object();
         public void Init(HttpApplication context)
         {
@@ -95,6 +98,7 @@ namespace SVLJ.Security
             ErrorPageUrl			= ConfigurationManager.AppSettings["SVLJ_ErrorRedirectUrl"] ?? "/error/403c.html";
 	    bypassList				= ConfigurationManager.AppSettings["SVLJ_InternalBypassIPs"];
 	    ekuConfig				= ConfigurationManager.AppSettings["SVLJ_AllowedEKUOids"];
+     	    signatureAlgsSetting		= ConfigurationManager.AppSettings["SVLJ_AllowedSignatureAlgorithms"];
 
 	    /// Enumerate RequiredCertSerialNumbers
             if (!string.IsNullOrWhiteSpace(RequiredCertSerialNumbers))
@@ -119,6 +123,15 @@ namespace SVLJ.Security
 		 AllowedEkuOids.UnionWith(
 		        ekuConfig.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
 		                    .Select(s => s.Trim()));
+	     }
+
+            /// Enumerate signatureAlgsSetting
+	     if (!string.IsNullOrWhiteSpace(signatureAlgsSetting))
+	     {
+		    AllowedSignatureAlgs.UnionWith(
+		        signatureAlgsSetting
+		            .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+		            	.Select(a => a.Trim().ToLowerInvariant()));
 	     }
      
             LoadCABundle(CABundlePath);
@@ -250,6 +263,17 @@ namespace SVLJ.Security
 		    if (!certOids.Overlaps(AllowedEkuOids))
 		    {
 		        Redirect(app, "eku-not-allowed");
+		        return;
+		    }
+		}
+
+  		// Step 8: Optional Signature Algorithms enforcement
+  		if (AllowedSignatureAlgs.Count > 0)
+		{
+		    var sigAlg = clientCert.SignatureAlgorithm?.FriendlyName?.ToLowerInvariant();
+		    if (string.IsNullOrWhiteSpace(sigAlg) || !AllowedSignatureAlgs.Contains(sigAlg))
+		    {
+		        Redirect(app, "sigalg-not-allowed");
 		        return;
 		    }
 		}
