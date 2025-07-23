@@ -16,9 +16,6 @@ They can be enabled explicitly via `web.config` (`appSettings`) to maintain comp
 - [ ] KeyUsage bit enforcement  
   _(Block certificates missing digitalSignature or with invalid bitmask)_
 
-- [ ] Signature algorithm enforcement  
-  _(Reject certs signed with SHA1, MD5, or other insecure algorithms)_
-
 - [ ] Local fallback cache for CRL  
   _(Optional file-based cache if online revocation fails)_
 
@@ -40,8 +37,8 @@ They can be enabled explicitly via `web.config` (`appSettings`) to maintain comp
 
 | Feature                          | Target Version |
 |----------------------------------|----------------|
-| Signature algorithm checks       | 1.5            |
-| JSON-formatted logging           | 1.6            |
-| CRL local fallback / caching     | 1.6            |
-| Configuration validation         | 1.6            |
-| Cipher suite validation          | 1.7            |
+| KeyUsage bit enforcement         | 1.4.5          |
+| JSON-formatted logging           | 1.4.6          |
+| CRL local fallback / caching     | 1.4.7          |
+| Configuration validation         | 1.4.8          |
+| Cipher suite validation          | 1.4.9          |
