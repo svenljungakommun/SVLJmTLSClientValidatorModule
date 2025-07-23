@@ -53,6 +53,7 @@ namespace SVLJ.Security
     /// - SVLJ_CABundlePath         = Full path to a PEM file containing trusted CA certificates
     /// - SVLJ_ErrorRedirectUrl     = URL to redirect unauthorized clients (default: /error/403c.html)
     /// - SVLJ_InternalBypassIPs    = (Optional) Comma-separated list of IPs to bypass mTLS validation
+    /// - SVLJ_AllowedEKUOids	    = (Optional) Comma-separated list of allowed EKUs
     ///
     /// Requests that do not meet the policy are rejected before application logic is invoked.
     ///
@@ -66,8 +67,8 @@ namespace SVLJ.Security
     /// Recommended environment: Windows Server with IIS 10+, .NET Framework 4.7.2+
     ///
     /// Author: Abdulaziz Almazrli / Odd-Arne Haraldsen
-    /// Version: 1.4.2
-    /// Updated: 2025-07-22
+    /// Version: 1.4.3
+    /// Updated: 2025-07-23
     /// </summary>
 
     public class SVLJmTLSClientValidatorModule : IHttpModule
@@ -79,9 +80,11 @@ namespace SVLJ.Security
         private static string CABundlePath;
         private static string ErrorPageUrl;
 	private static string bypassList;
+ 	private static string ekuConfig;
 	private static readonly HashSet<string> AllowedCertSerials = new HashSet<string>();
  	private static readonly HashSet<string> InternalBypassIPs = new HashSet<string>();
         private static readonly List<X509Certificate2> TrustedIssuers = new List<X509Certificate2>();
+	private static readonly HashSet<string> AllowedEkuOids = new HashSet<string>();
         private static readonly object IssuerLock = new object();
         public void Init(HttpApplication context)
         {
@@ -91,6 +94,7 @@ namespace SVLJ.Security
             CABundlePath			= ConfigurationManager.AppSettings["SVLJ_CABundlePath"];
             ErrorPageUrl			= ConfigurationManager.AppSettings["SVLJ_ErrorRedirectUrl"] ?? "/error/403c.html";
 	    bypassList				= ConfigurationManager.AppSettings["SVLJ_InternalBypassIPs"];
+	    ekuConfig				= ConfigurationManager.AppSettings["SVLJ_AllowedEKUOids"];
 
 	    /// Enumerate RequiredCertSerialNumbers
             if (!string.IsNullOrWhiteSpace(RequiredCertSerialNumbers))
@@ -108,6 +112,14 @@ namespace SVLJ.Security
                     bypassList.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                               .Select(ip => ip.Trim()));
             }
+
+            /// Enumerate ekuConfig
+	     if (!string.IsNullOrWhiteSpace(ekuConfig))
+	     {
+		 AllowedEkuOids.UnionWith(
+		        ekuConfig.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+		                    .Select(s => s.Trim()));
+	     }
      
             LoadCABundle(CABundlePath);
             context.BeginRequest += OnBeginRequest;
@@ -175,7 +187,7 @@ namespace SVLJ.Security
  
                 // Step 2: Check expected Issuer CN
                 var issuerName = new X500DistinguishedName(clientCert.Issuer).Name;
-                if (!issuerName.Equals($"CN={RequiredIssuerName}", StringComparison.OrdinalIgnoreCase))
+		if (!string.Equals(issuerName, $"CN={RequiredIssuerName}", StringComparison.OrdinalIgnoreCase))
                 {
                     Redirect(app, "issuer-name-mismatch");
                     return;
@@ -213,6 +225,31 @@ namespace SVLJ.Security
 		    if (string.IsNullOrWhiteSpace(serial) || !AllowedCertSerials.Contains(serial))
 		    {
 		        Redirect(app, "serial-mismatch");
+		        return;
+		    }
+		}
+
+  		// Step 7: Optional EKU enforcement
+		if (AllowedEkuOids.Count > 0)
+		{
+		    var ekuExt = clientCert.Extensions
+		        .OfType<X509EnhancedKeyUsageExtension>()
+		        .FirstOrDefault();
+		
+		    if (ekuExt == null || ekuExt.EnhancedKeyUsages == null || ekuExt.EnhancedKeyUsages.Count == 0)
+		    {
+		        Redirect(app, "eku-missing");
+		        return;
+		    }
+		
+		    var certOids = ekuExt.EnhancedKeyUsages
+		        .Cast<Oid>()
+		        .Select(oid => oid.Value)
+		        .ToHashSet();
+		
+		    if (!certOids.Overlaps(AllowedEkuOids))
+		    {
+		        Redirect(app, "eku-not-allowed");
 		        return;
 		    }
 		}
