@@ -57,8 +57,8 @@ The module protects backend systems by enforcing strict client authentication us
 | ServerVariables availability      | ✅ OK   | Metadata exposed to app, not encrypted                 |
 | Logging                           | ⚠️ WARN | Only System.Diagnostics.Trace, no SIEM/SOC integration |
 | EKU/KeyUsage check                | ✅ OK   | Implemented in version 1.4.3                           |
-| Algorithm control                 | ❌ FAIL | Not implemented                                        |
-| Physical protection class         | N/A     | Handled by environment                                 |
+| Algorithm control                 | ✅ OK   | Implemented in version 1.4.4                           |
+| Physical protection class         | 🛈 INFO  | Handled by environment                                 |
 
 ---
 
@@ -66,8 +66,6 @@ The module protects backend systems by enforcing strict client authentication us
 
 | Recommendation                                    | Priority | Justification                              |
 |---------------------------------------------------|----------|--------------------------------------------|
-| Add EKU (Extended Key Usage) check                | High     | Restrict to correct certificate types      |
-| Add signature algorithm check (SHA256+)           | Medium   | Avoid outdated algorithms like SHA1        |
 | Implement CRL fallback via local cache or mirror  | Medium   | Handle offline validation scenarios        |
 | Add logging in SIEM-compatible format (e.g., JSON)| Medium   | Simplifies troubleshooting and monitoring  |
 | Validate config at init (fail-fast)               | Low      | Increases operational reliability          |
