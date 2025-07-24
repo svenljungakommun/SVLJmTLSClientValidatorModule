@@ -6,6 +6,7 @@
     Protected Function GetDumpHtml() As String
         Dim certHeaders As String() = {
             "HTTP_SVLJ_SUBJECT",
+            "HTTP_SVLJ_THUMBPRINT",
             "HTTP_SVLJ_ISSUER",
             "HTTP_SVLJ_SERIAL",
             "HTTP_SVLJ_VALIDFROM",
