@@ -37,8 +37,8 @@ They can be enabled explicitly via `web.config` (`appSettings`) to maintain comp
 
 | Feature                          | Target Version |
 |----------------------------------|----------------|
-| KeyUsage bit enforcement         | 1.4.5          |
-| JSON-formatted logging           | 1.4.6          |
-| CRL local fallback / caching     | 1.4.7          |
-| Configuration validation         | 1.4.8          |
-| Cipher suite validation          | 1.4.9          |
+| KeyUsage bit enforcement         | 1.4.6          |
+| JSON-formatted logging           | 1.4.7          |
+| CRL local fallback / caching     | 1.4.8          |
+| Configuration validation         | 1.4.9          |
+| Cipher suite validation          | 1.5.0          |
