@@ -30,6 +30,7 @@ It validates client X.509 certificates against configurable trust policies, incl
   - Optional client certificate thumbprint validation
 - 📤 Certificate attributes exposed as HTTP headers:
   - `HTTP_SVLJ_SUBJECT`
+  - `HTTP_SVLJ_THUMBPRINT`
   - `HTTP_SVLJ_ISSUER`
   - `HTTP_SVLJ_SERIAL`
   - `HTTP_SVLJ_VALIDFROM`
