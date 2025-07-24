@@ -56,10 +56,38 @@ Create `Properties\AssemblyInfo.cs` with content like:
 
 ```csharp
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+// General Information about an assembly is controlled through the following
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
 [assembly: AssemblyTitle("SVLJ.Security")]
-[assembly: AssemblyDescription("mTLS Validation Module for IIS")]
-[assembly: AssemblyVersion("1.4.0.0")]
-[assembly: AssemblyFileVersion("1.4.0.0")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Svenljunga kommun")]
+[assembly: AssemblyProduct("SVLJ.Security")]
+[assembly: AssemblyCopyright("Copyright © Svenljunga kommun 2025")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+// Setting ComVisible to false makes the types in this assembly not visible
+// to COM components.  If you need to access a type in this assembly from
+// COM, set the ComVisible attribute to true on that type.
+[assembly: ComVisible(false)]
+
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("bcf9774f-bc1f-4298-8048-c7e2147cae4a")]
+
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version
+//      Build Number
+//      Revision
+//
+[assembly: AssemblyVersion("1.4.5.0")]
+[assembly: AssemblyFileVersion("1.4.5.0")]
 ````
 
 ### 4. Build the DLL
@@ -71,10 +99,6 @@ using System.Reflection;
 ```
 <project path>\bin\Release\SVLJ.Security.dll
 ```
-
-Understood. Here's the revised version of **Step 5 – Sign the DLL**, with the build step removed (as it's already covered in step 4):
-
----
 
 ### 5. Sign the DLL
 
