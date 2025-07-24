@@ -72,6 +72,41 @@ using System.Reflection;
 <project path>\bin\Release\SVLJ.Security.dll
 ```
 
+Understood. Here's the revised version of **Step 5 – Sign the DLL**, with the build step removed (as it's already covered in step 4):
+
+---
+
+### 5. Sign the DLL
+
+To ensure integrity and authenticity of the built module, sign the output DLL using `signtool.exe`, included with the **Windows SDK**.
+
+1. **Locate `signtool.exe`**
+   Typically found at:
+   `C:\Program Files (x86)\Windows Kits\10\bin\<version>\x64\signtool.exe`
+   Add this path to your `PATH` environment variable for easier access, or reference it directly in the command.
+
+2. **Run the signing command**:
+
+   ```bash
+   signtool sign ^
+     /f "certificate.pfx" ^
+     /p <password> ^
+     /tr http://timestamp.digicert.com ^
+     /td sha256 ^
+     /fd sha256 ^
+     "<project path>\bin\Release\SVLJ.Security.dll"
+   ```
+
+   **Parameters:**
+
+   * `/f` – Path to your PFX certificate file
+   * `/p` – Password for the certificate
+   * `/tr` – Timestamp server URL
+   * `/td` – Digest algorithm for the timestamp (SHA-256)
+   * `/fd` – Digest algorithm for the file signature (SHA-256)
+
+> **Note:** Timestamping ensures the signature remains valid even after the signing certificate expires.
+
 ---
 
 ## 🚀 Deployment
