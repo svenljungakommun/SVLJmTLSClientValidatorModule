@@ -205,6 +205,7 @@ namespace SVLJ.Security
                 // Step 1: Expose cert info via HTTP headers
                 var sv = app.Context.Request.ServerVariables;
                 sv.Set("HTTP_SVLJ_SUBJECT", clientCert.Subject);
+		sv.Set("HTTP_SVLJ_THUMBPRINT", clientCert.Thumbprint?.Replace(" ", "").ToUpperInvariant())
                 sv.Set("HTTP_SVLJ_ISSUER", clientCert.Issuer);
                 sv.Set("HTTP_SVLJ_SERIAL", clientCert.SerialNumber);
                 sv.Set("HTTP_SVLJ_VALIDFROM", clientCert.NotBefore.ToString("s"));
