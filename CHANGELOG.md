@@ -6,6 +6,16 @@ This project adheres to a **fail-closed Zero Trust model** and is used in IIS-ho
 
 ---
 
+## [1.4.5] – 2025-07-24
+
+### Added
+- Optional validation of client certificate thumbprint via `SVLJ_AllowedClientThumbprints`.
+- New rejection reason `client-thumbprint-not-allowed` displayed via `403c.html`.
+
+### Changed
+- Updated `403c.html` to include explanation for `client-thumbprint-not-allowed`.
+- Extended XML documentation in source code to reflect thumbprint validation feature.
+
 ## [1.4.4] – 2025-07-23
 
 ### Added
