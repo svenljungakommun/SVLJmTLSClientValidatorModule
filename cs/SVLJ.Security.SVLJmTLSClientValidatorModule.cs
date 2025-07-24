@@ -47,14 +47,15 @@ namespace SVLJ.Security
     /// - Redirects unauthorized requests to a configured error URL with a reason code
     ///
     /// Configuration is handled via `appSettings` in `web.config`:
-    /// - SVLJ_IssuerName           		= Required Issuer CN (e.g. "SVLJ ADM Issuing CA v1")
-    /// - SVLJ_IssuerThumbprint     		= (Optional) SHA-1 thumbprint of the trusted issuer certificate
+    /// - SVLJ_IssuerName           		= (Required) Issuer CN (e.g. "SVLJ ADM Issuing CA v1")
+    /// - SVLJ_CABundlePath         		= (Required) Full path to a PEM file containing trusted CA certificates
+    /// - SVLJ_ErrorRedirectUrl     		= (Required) URL to redirect unauthorized clients (default: /error/403c.html)
+    /// - SVLJ_IssuerThumbprint     		= (Optional) SHA-1 thumbprint of the trusted issuer certificate  (SHA1)
     /// - SVLJ_CertSerialNumbers    		= (Optional) Comma-separated list of allowed client certificate serial numbers
-    /// - SVLJ_CABundlePath         		= Full path to a PEM file containing trusted CA certificates
-    /// - SVLJ_ErrorRedirectUrl     		= URL to redirect unauthorized clients (default: /error/403c.html)
     /// - SVLJ_InternalBypassIPs    		= (Optional) Comma-separated list of IPs to bypass mTLS validation
     /// - SVLJ_AllowedEKUOids	    		= (Optional) Comma-separated list of allowed EKUs
     /// - SVLJ_AllowedSignatureAlgorithms	= (Optional) Comma-separated list of allowed Signature Algorithms
+    /// - SVLJ_AllowedClientThumbprints		= (Optional) Comma-separated list of allowed client certificate thumbprints (SHA1)
     ///
     /// Requests that do not meet the policy are rejected before application logic is invoked.
     ///
@@ -68,8 +69,8 @@ namespace SVLJ.Security
     /// Recommended environment: Windows Server with IIS 10+, .NET Framework 4.7.2+
     ///
     /// Author: Abdulaziz Almazrli / Odd-Arne Haraldsen
-    /// Version: 1.4.4
-    /// Updated: 2025-07-23
+    /// Version: 1.4.5
+    /// Updated: 2025-07-24
     /// </summary>
 
     public class SVLJmTLSClientValidatorModule : IHttpModule
@@ -83,11 +84,13 @@ namespace SVLJ.Security
 	private static string bypassList;
  	private static string ekuConfig;
   	private static string signatureAlgsSetting;
+   	private static string allowedClientThumbprintsSetting;
 	private static readonly HashSet<string> AllowedCertSerials = new HashSet<string>();
  	private static readonly HashSet<string> InternalBypassIPs = new HashSet<string>();
         private static readonly List<X509Certificate2> TrustedIssuers = new List<X509Certificate2>();
 	private static readonly HashSet<string> AllowedEkuOids = new HashSet<string>();
  	private static readonly HashSet<string> AllowedSignatureAlgs = new HashSet<string>();
+  	private static readonly HashSet<string> AllowedClientThumbprints = new HashSet<string>();
         private static readonly object IssuerLock = new object();
         public void Init(HttpApplication context)
         {
@@ -99,6 +102,7 @@ namespace SVLJ.Security
 	    bypassList				= ConfigurationManager.AppSettings["SVLJ_InternalBypassIPs"];
 	    ekuConfig				= ConfigurationManager.AppSettings["SVLJ_AllowedEKUOids"];
      	    signatureAlgsSetting		= ConfigurationManager.AppSettings["SVLJ_AllowedSignatureAlgorithms"];
+	    allowedClientThumbprintsSetting 	= ConfigurationManager.AppSettings["SVLJ_AllowedClientThumbprints"];
 
 	    /// Enumerate RequiredCertSerialNumbers
             if (!string.IsNullOrWhiteSpace(RequiredCertSerialNumbers))
@@ -132,6 +136,15 @@ namespace SVLJ.Security
 		        signatureAlgsSetting
 		            .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
 		            	.Select(a => a.Trim().ToLowerInvariant()));
+	     }
+
+            /// Enumerate allowedClientThumbprintsSetting
+	     if (!string.IsNullOrWhiteSpace(allowedClientThumbprintsSetting))
+	     {
+		    AllowedClientThumbprints.UnionWith(
+		        allowedClientThumbprintsSetting
+		            .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+		            .Select(tp => tp.Trim().ToUpperInvariant()));
 	     }
      
             LoadCABundle(CABundlePath);
@@ -274,6 +287,17 @@ namespace SVLJ.Security
 		    if (string.IsNullOrWhiteSpace(sigAlg) || !AllowedSignatureAlgs.Contains(sigAlg))
 		    {
 		        Redirect(app, "sigalg-not-allowed");
+		        return;
+		    }
+		}
+
+  		// Step 9: Optional Client Thumbprint enforcement
+		if (AllowedClientThumbprints.Count > 0)
+		{
+		    var thumbprint = clientCert.Thumbprint?.Replace(" ", "").ToUpperInvariant();
+		    if (string.IsNullOrWhiteSpace(thumbprint) || !AllowedClientThumbprints.Contains(thumbprint))
+		    {
+		        Redirect(app, "client-thumbprint-not-allowed");
 		        return;
 		    }
 		}
