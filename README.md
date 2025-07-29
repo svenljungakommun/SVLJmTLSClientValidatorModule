@@ -11,11 +11,10 @@ Maintainer: Svenljunga kommun
 
 It validates client X.509 certificates against configurable trust policies, including issuer verification, certificate chain validation using a local CA bundle, CRL checking, and optional thumbprint enforcement. Built for secure municipal and public sector infrastructure in Zero Trust architectures.
 
-**🔗 SVLJmTLSClientValidatorFilter**  
-A corresponding module is available for Java-based environments running Apache Tomcat:
-[https://github.com/svenljungakommun/SVLJmTLSClientValidatorFilter](https://github.com/svenljungakommun/SVLJmTLSClientValidatorFilter)
-
-This Java Servlet Filter provides equivalent functionality, use this module when deploying to Tomcat or other servlet containers in J2EE environments.
+**🔗 SVLJmTLSClientValidator**  
+SVLJmTLSClientValidator is available for both Java (Tomcat) and Lua (Apache2), offering identical fail-closed mTLS validation across platforms.  
+[`SVLJmTLSClientValidatorFilter`](https://github.com/svenljungakommun/SVLJmTLSClientValidatorFilter) – Java Servlet Filter for Tomcat  
+[`SVLJmTLSClientValidatorLUA`](https://github.com/svenljungakommun/SVLJmTLSClientValidatorLUA) – mod_lua implementation for Apache2
 
 ---
 
