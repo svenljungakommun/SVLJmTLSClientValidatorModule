@@ -43,3 +43,5 @@ They can be enabled explicitly via `web.config` (`appSettings`) to maintain comp
 | Configuration validation                              | 1.4.9          |
 | Cipher suite validation                               | 1.5.0          |
 | Code & parameter cleanup and standardisation          | 1.5.1          |
+| OCSP support                                          | x.x            |
+
