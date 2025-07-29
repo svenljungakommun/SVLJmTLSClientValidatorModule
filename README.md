@@ -17,7 +17,6 @@ A corresponding module is available for Java-based environments running Apache T
 
 This Java Servlet Filter provides equivalent functionality, use this module when deploying to Tomcat or other servlet containers in J2EE environments.
 
-
 ---
 
 ## Features
@@ -45,6 +44,18 @@ This Java Servlet Filter provides equivalent functionality, use this module when
   - `HTTP_SVLJ_SIGNATUREALG`
 - ⚙️ Configuration via `appSettings` in `web.config`
 - 🚫 Fail-closed design: unauthenticated clients are redirected
+
+---
+
+## Compliance Alignment
+
+This module supports security controls required by:
+
+- **NIS2 Directive**
+- **ISO/IEC 27001 & 27002**
+- **GDPR (Art. 32 – Security of processing)**
+- **CIS Benchmarks**
+- **STIGs (US DoD)**
 
 ---
 
