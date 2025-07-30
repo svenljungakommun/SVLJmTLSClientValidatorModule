@@ -24,12 +24,12 @@ SVLJmTLSClientValidator is available for .NET (IIS), Java (Tomcat), and Lua (Apa
 - 🔐 Strict mTLS enforcement on all incoming HTTPS requests
 - ✅ Validation logic:
   - Ensures HTTPS and client certificate presence
-  - Matches Issuer CN (`SVLJ_IssuerName`)
-  - Validates chain against PEM bundle (`SVLJ_CABundlePath`)
+  - Matches Issuer CN
+  - Validates chain against PEM bundle
   - Performs CRL check via `X509Chain`
   - Enforces NotBefore and NotAfter date validity
-  - Optional issuer thumbprint (`SVLJ_IssuerThumbprint`)
-  - Optional strict client certificate serial whitelist (SVLJ_CertSerialNumbers)
+  - Optional issuer thumbprint
+  - Optional strict client certificate serial whitelist
   - Optional IP whitelist/bypass
   - Optional EKU validation
   - Optional Signature Algorithms validation
